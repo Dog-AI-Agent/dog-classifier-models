@@ -106,12 +106,12 @@ breed-classifier/
 
 ## 팀 구성
 
-| 이름            | 역할                        |
-| --------------- | --------------------         |
-| 김재현          | Project Leader              |
-| 최동원          | Optimizing Model            |
-| 이민혜          | Model selection             |
-| 송진우          | Evaluating Outputs          |
-| 장승우          | Test Set Creator            |
+| 이름   | 역할               |
+| ------ | ------------------ |
+| 김재현 | Project Leader     |
+| 최동원 | Optimizing Model   |
+| 이민혜 | Model selection    |
+| 송진우 | Evaluating Outputs |
+| 장승우 | Test Set Creator   |
 
 ---
