@@ -56,6 +56,7 @@ class Trainer:
         self.writer = SummaryWriter(log_dir=str(log_path))
 
         self.best_val_acc = 0.0
+        self.total_epochs = cfg.epochs
 
     def train_one_epoch(self, epoch: int) -> dict:
         self.model.train()
@@ -64,7 +65,7 @@ class Trainer:
         total_top5 = 0.0
         n_batches = 0
 
-        pbar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.cfg.epochs} [Train]")
+        pbar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.total_epochs} [Train]")
         for images, labels in pbar:
             images, labels = images.to(self.device), labels.to(self.device)
 
@@ -100,7 +101,7 @@ class Trainer:
         n_batches = 0
         all_preds, all_targets = [], []
 
-        pbar = tqdm(self.val_loader, desc=f"Epoch {epoch+1}/{self.cfg.epochs} [Val]")
+        pbar = tqdm(self.val_loader, desc=f"Epoch {epoch+1}/{self.total_epochs} [Val]")
         for images, labels in pbar:
             images, labels = images.to(self.device), labels.to(self.device)
 
@@ -134,6 +135,14 @@ class Trainer:
             "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
+            "scheduler_state_dict": self.scheduler.state_dict(),
+            "scaler_state_dict": self.scaler.state_dict(),
+            "early_stopping": {
+                "patience": self.early_stopping.patience,
+                "counter": self.early_stopping.counter,
+                "best_score": self.early_stopping.best_score,
+            },
+            "best_val_acc": self.best_val_acc,
             "val_top1": val_metrics["top1"],
             "val_top5": val_metrics["top5"],
             "val_f1": val_metrics["f1"],
@@ -145,6 +154,32 @@ class Trainer:
         }, path)
         print(f"  Saved checkpoint: {path}")
 
+    def load_checkpoint(self) -> int:
+        path = self.checkpoint_dir / f"best_{self.cfg.model_name}.pt"
+        if not path.exists():
+            print(f"  No checkpoint found at {path}, training from scratch.")
+            return 0
+
+        ckpt = torch.load(path, map_location=self.device, weights_only=False)
+        self.model.load_state_dict(ckpt["model_state_dict"])
+        self.optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+
+        if "scheduler_state_dict" in ckpt:
+            self.scheduler.load_state_dict(ckpt["scheduler_state_dict"])
+        if "scaler_state_dict" in ckpt:
+            self.scaler.load_state_dict(ckpt["scaler_state_dict"])
+        if "early_stopping" in ckpt:
+            es = ckpt["early_stopping"]
+            self.early_stopping.patience = es["patience"]
+            self.early_stopping.counter = es["counter"]
+            self.early_stopping.best_score = es["best_score"]
+        if "best_val_acc" in ckpt:
+            self.best_val_acc = ckpt["best_val_acc"]
+
+        start_epoch = ckpt["epoch"] + 1
+        print(f"  Resumed from {path} (epoch {ckpt['epoch']}, val_top1: {ckpt['val_top1']:.2f}%)")
+        return start_epoch
+
     def log_metrics(self, epoch: int, train_metrics: dict, val_metrics: dict):
         self.writer.add_scalars("loss", {"train": train_metrics["loss"], "val": val_metrics["loss"]}, epoch)
         self.writer.add_scalars("top1_acc", {"train": train_metrics["top1"], "val": val_metrics["top1"]}, epoch)
@@ -152,11 +187,17 @@ class Trainer:
         self.writer.add_scalar("val/f1", val_metrics["f1"], epoch)
         self.writer.add_scalar("lr", self.optimizer.param_groups[0]["lr"], epoch)
 
-    def fit(self):
-        print(f"\nTraining {self.cfg.model_name} for {self.cfg.epochs} epochs on {self.device}")
+    def fit(self, resume: bool = False):
+        start_epoch = self.load_checkpoint() if resume else 0
+        total_epochs = start_epoch + self.cfg.epochs
+
+        self.total_epochs = total_epochs
+        self.scheduler.T_max = total_epochs
+
+        print(f"\nTraining {self.cfg.model_name} for epochs {start_epoch}~{total_epochs - 1} on {self.device}")
         print(f"  Train batches: {len(self.train_loader)}, Val batches: {len(self.val_loader)}\n")
 
-        for epoch in range(self.cfg.epochs):
+        for epoch in range(start_epoch, total_epochs):
             train_metrics = self.train_one_epoch(epoch)
             val_metrics = self.validate(epoch)
             self.scheduler.step()

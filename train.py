@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=None, help="Override batch size")
     parser.add_argument("--lr", type=float, default=None, help="Override learning rate")
     parser.add_argument("--seed", type=int, default=None, help="Override seed")
+    parser.add_argument("--resume", action="store_true", help="Resume training from best checkpoint")
     return parser.parse_args()
 
 
@@ -45,7 +46,7 @@ def main():
     print(f"Model parameters: {param_count:.1f}M")
 
     trainer = Trainer(model, cfg, train_loader, val_loader, device)
-    trainer.fit()
+    trainer.fit(resume=args.resume)
 
 
 if __name__ == "__main__":
