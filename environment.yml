@@ -1,0 +1,6 @@
+name: breed-classifier
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip

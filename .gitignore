@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data & model artifacts
+data/
+checkpoints/
+logs/
+*.h5
+*.pt
+*.pth
+*.onnx
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc
+*.log
+.env
+
+# Python tools
+.pytest_cache/
+.mypy_cache/
+
+# ML / AI extras
+*.ckpt
+wandb/
+runs/
+
+# AI tools
+.forge-log
+.claude/
+CLAUDE.md
