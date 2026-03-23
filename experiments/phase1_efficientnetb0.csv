@@ -1,0 +1,2 @@
+backbone,val_acc_last,val_acc_best,val_top5_best,train_time_min,infer_ms,model_size_mb
+efficientnetb0,0.8552,0.8552,0.9867,19.4,54.26,18.0

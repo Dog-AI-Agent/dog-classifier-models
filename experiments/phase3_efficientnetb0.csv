@@ -1,0 +1,2 @@
+backbone,phase,val_acc_best,val_top5_best,test_acc,test_top5,epochs_run,train_time_min
+efficientnetb0,Phase3,0.8637,0.9875,0.8696,0.9892,17,24.0

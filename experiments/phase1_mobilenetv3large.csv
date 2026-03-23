@@ -1,0 +1,2 @@
+backbone,val_acc_last,val_acc_best,val_top5_best,train_time_min,infer_ms,model_size_mb
+mobilenetv3large,0.7818,0.7818,0.9678,13.4,41.97,13.4
