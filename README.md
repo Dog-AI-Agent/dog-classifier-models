@@ -27,7 +27,6 @@ Apple M2 Mac 로컬 환경에서 실행됩니다.
 - MobileNetV2
 - MobileNetV3Large
 - EfficientNetB0
-- EfficientNetB3
 
 ## Phase 1 결과
 
