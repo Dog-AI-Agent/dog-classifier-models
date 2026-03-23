@@ -87,7 +87,3 @@ jupyter notebook backbone_comparison.ipynb
 - TensorFlow 2.16.2
 - Dataset: [Stanford Dogs](http://vision.stanford.edu/aditya86/ImageNetDogs/) via `tensorflow-datasets`
 
-## 참고
-
-베이스라인 모델 구조는 [aribiswas/stanford-dogs-classifier](https://github.com/aribiswas/stanford-dogs-classifier)를 참고했습니다.
-백본 비교 실험, Validation set 구축, EarlyStopping 적용 등 성능 개선 과정은 본 레포에서 직접 진행했습니다.
