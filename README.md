@@ -39,6 +39,28 @@ Apple M2 Mac 로컬 환경에서 실행됩니다.
 
 → **EfficientNetB0** 가 최고 성능으로 Phase 2 진행
 
+## 핵심 흐름 & 결론
+
+| Phase | 모델 | val_acc | 비고 |
+|-------|------|---------|------|
+| Phase 1 (baseline) | MobileNetV2 | 77.9% | 기준선 |
+| Phase 1 | EfficientNetB0 | 85.5% | 백본 교체만으로 **+7.6%p** |
+| Phase 2 | EfficientNetB0 | **86.9%** | EarlyStopping + proper validation 추가 **+1.5%p** |
+| Phase 3 | EfficientNetB0 | 86.9% | 추가 학습 시도, 유의미한 개선 없음 → Phase 2 채택 |
+
+**최종 개선폭: MobileNetV2 대비 +9.1%p**
+
+### 요인 분석
+
+- **백본 교체 (+7.6%p)**: 같은 학습 조건에서 MobileNetV2 → EfficientNetB0로만 바꿔도 가장 큰 성능 향상
+- **학습 방식 개선 (+1.5%p)**: EarlyStopping + 최적 모델 저장(ModelCheckpoint) + proper validation 분리 적용
+- **Phase 3**: 추가 학습을 시도했으나 17 epoch에서 EarlyStopping 발동, 이미 수렴 상태 확인 → Phase 2 모델 최종 채택
+
+### 발표 포인트
+
+> 백본 교체만으로 7%p 이상 올랐고, 거기에 학습 방식(EarlyStopping + 최적 모델 저장)까지 개선해서 총 9%p 향상.
+> Phase 3는 "추가 학습을 시도했지만 유의미한 개선 없음 → Phase 2 채택"으로 정리.
+
 ## 파일 구조
 
 ```
